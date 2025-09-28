@@ -1,0 +1,451 @@
+<?php
+// PHP-код для логирования IP-адресов
+// Эта часть будет выполняться при каждом посещении сайта
+
+/**
+ * Получает IP-адрес клиента, учитывая прокси и CDN.
+ * @return string IP-адрес клиента.
+ */
+function get_client_ip() {
+    $ipaddress = '';
+    if (isset($_SERVER['HTTP_CLIENT_IP']))
+        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+    else if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) // Для сайтов за прокси/CDN (например, Cloudflare)
+        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    else if(isset($_SERVER['REMOTE_ADDR']))
+        $ipaddress = $_SERVER['REMOTE_ADDR'];
+    else
+        $ipaddress = 'UNKNOWN';
+
+    // В случае X-Forwarded-For может быть список IP, берем первый (наиболее вероятный клиентский)
+    if (strpos($ipaddress, ',') !== false) {
+        $ip_array = explode(',', $ipaddress);
+        $ipaddress = trim($ip_array[0]);
+    }
+    return $ipaddress;
+}
+
+/**
+ * Логирует информацию о доступе клиента в файл.
+ */
+function log_client_access() {
+    // !!! ОЧЕНЬ ВАЖНО: УКАЖИТЕ ПРАВИЛЬНЫЙ ПУТЬ К ЛОГ-ФАЙЛУ !!!
+    // Настоятельно рекомендуется размещать папку 'logs' ВНЕ корневой директории вашего сайта (public_html, www, htdocs)
+    // Это лучший способ защитить логи от прямого доступа через браузер.
+    // Пример: если ваш сайт в /var/www/dorkosfeed.ru/public_html, то log_file будет в /var/www/dorkosfeed.ru/logs/
+$log_file = __DIR__ . '/logs/ip_access.log'; // Добавил слеш в начале
+    // Убедимся, что директория для логов существует
+    $log_dir = dirname($log_file);
+    if (!is_dir($log_dir)) {
+        mkdir($log_dir, 0755, true); // Создаем папку, если ее нет. 0755 - стандартные права, true - рекурсивное создание.
+    }
+
+    $ip = get_client_ip();
+    $timestamp = date('Y-m-d H:i:s');
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'N/A'; // Информация о браузере/ОС
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '/';      // Запрошенный URL
+    $referer = $_SERVER['HTTP_REFERER'] ?? 'N/A';       // Откуда пришел пользователь (если есть)
+
+    $log_entry = "$timestamp | IP: $ip | URI: $request_uri | UA: $user_agent | Referer: $referer\n";
+
+    // Записываем лог в файл. FILE_APPEND добавляет в конец, LOCK_EX блокирует файл во время записи.
+    file_put_contents($log_file, $log_entry, FILE_APPEND | LOCK_EX);
+}
+
+// Вызываем функцию логирования при каждом загрузке страницы
+log_client_access();
+?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold Lead/钢老板 - Биография Членососа</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome для иконок соцсетей -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Общие стили для фона и текста */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0d0d0d; /* Очень темный фон */
+            color: #e0e0e0; /* Светлый текст */
+        }
+
+        /* Настройка цветов Tailwind для более точного соответствия примеру */
+        /* Вы можете настроить эти цвета в tailwind.config.js, если будете собирать Tailwind, но для CDN это нужно делать через произвольные классы или inline-стили */
+        .text-dorkos-accent { color: #007bff; /* Яркий синий, как в примере */ }
+        .bg-dorkos-dark { background-color: #0d0d0d; }
+        .border-dorkos-accent { border-color: #007bff; }
+        .hover\:bg-dorkos-accent:hover { background-color: #007bff; }
+        .hover\:text-dorkos-dark:hover { color: #0d0d0d; }
+        .hover\:border-dorkos-accent:hover { border-color: #007bff; }
+
+        /* Кастомный класс для анимации героя (заглушка вместо SVG) */
+        .hero-illustration {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            background-color: #1a1a1a; /* Цвет фона для заглушки */
+            background-image: linear-gradient(45deg, #1f1f1f 25%, transparent 25%, transparent 75%, #1f1f1f 75%, #1f1f1f),
+                              linear-gradient(45deg, #1f1f1f 25%, transparent 25%, transparent 75%, #1f1f1f 75%, #1f1f1f);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-illustration::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background-color: #007bff; /* Акцентный цвет для "эффекта" */
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0.3;
+            animation: pulse-glow 3s infinite alternate;
+        }
+        .hero-illustration::after {
+            content: 'Иллюстрация "Доркос"';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 1.5rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse-glow {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.2; }
+            to { transform: translate(-50%, -50%) scale(1.1); opacity: 0.4; }
+        }
+
+
+        /* Стили для лайтбокса */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .lightbox-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .lightbox-content img,
+        .lightbox-content video {
+            max-width: 100%;
+            max-height: 80vh; /* Ограничиваем высоту, чтобы было видно кнопку закрытия */
+            display: block;
+            margin: auto;
+            border: 3px solid #007bff; /* Акцентная рамка */
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.2s ease;
+        }
+        .lightbox-close:hover {
+            color: #ff0000; /* Красный при наведении */
+        }
+
+        /* Для видео в лайтбоксе */
+        .lightbox-video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+        }
+
+        .lightbox-video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Стили для плавного скролла */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-dorkos-dark text-gray-200">
+
+    <!-- Хедер/Навигация -->
+    <header class="bg-gray-900 shadow-lg py-4 px-6 md:px-12 fixed w-full top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Логотип -->
+            <a href="#home" class="text-2xl font-bold text-dorkos-accent tracking-wide">
+                Dorkosfeed.<span class="text-white">ru</span>
+            </a>
+
+            <!-- Навигация -->
+            <nav class="hidden md:flex space-x-8 text-lg">
+                <a href="#home" class="hover:text-dorkos-accent transition duration-300">Главная</a>
+                <a href="#lore" class="hover:text-dorkos-accent transition duration-300">Лор</a>
+                <a href="#gallery" class="hover:text-dorkos-accent transition duration-300">Галерея</a>
+                <a href="#social" class="hover:text-dorkos-accent transition duration-300">Связь с этим чмом</a>
+            </nav>
+
+            <!-- Социальные иконки и кнопка -->
+            <div class="flex items-center space-x-4">
+                <div class="flex space-x-4">
+                    <a href="https://vk.com/id265413472" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300">
+                        <i class="fab fa-vk text-xl"></i>
+                    </a>
+                    <a href="https://discord.gg/dorkosfeed" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300">
+                        <i class="fab fa-discord text-xl"></i>
+                    </a>
+                    <a href="https://t.me/construtc2025" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300">
+                        <i class="fab fa-telegram-plane text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Мобильное меню (пока заглушка, можно добавить JS для toggle) -->
+            <button class="md:hidden text-gray-200 text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-20"> <!-- Отступ сверху, чтобы контент не перекрывался хедером -->
+
+        <!-- Секция Главная/Герой -->
+        <section id="home" class="min-h-screen flex items-center justify-center py-16 px-6 md:px-12 bg-gradient-to-br from-gray-900 to-black">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                <!-- Левая часть - текст -->
+                <div class="text-center md:text-left max-w-2xl">
+                    <h2 class="text-sm uppercase tracking-widest text-gray-400 mb-4">ПРЕДУПРЕЖДЕНИЕ: ДОСЬЕ НА ДОРКОСА</h2>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-white">
+                        РАЗРУШАЕМ <span class="text-dorkos-accent">МИФЫ</span>,<br>РАСКРЫВАЕМ <span class="text-dorkos-accent">ПИДОРАСА</span>
+                    </h1>
+                    <p class="text-lg md:text-xl leading-relaxed text-gray-400 mb-8">
+                        Это не просто биография. Это хроника петуха, манипуляций и предательств, оставленных после себя одним из самых скрытных и "влиятельных" петухов теневого мира.
+                        Погрузитесь в истинную историю Доркоса мать его.в кино видел...
+                    </p>
+                    <a href="#lore" class="inline-block py-3 px-8 border-2 border-dorkos-accent text-dorkos-accent rounded-lg
+                                          hover:bg-dorkos-accent hover:text-dorkos-dark transition duration-300 font-bold text-lg">
+                        ЧИТАТЬ ХРОНИКИ
+                    </a>
+                </div>
+
+                <!-- Правая часть - заглушка иллюстрации -->
+                <div class="hero-illustration">                    <img src="1.png" alt="Изображение 1" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent"></div>
+            </div>
+        </section>
+
+        <!-- Секция Лор/Биография -->
+        <section id="lore" class="py-16 px-6 md:px-12 bg-gray-900">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 text-dorkos-accent">Лор: Путь к Темной Славе Петуха</h2>
+
+                <div class="max-w-4xl mx-auto space-y-8 text-lg leading-relaxed text-gray-300">
+                    <p>
+                        Доркос — это не имя, а клеймо как у собаки, символ неудержимой амбиции и абсолютного безразличия к человеческим судьбам. Его происхождение окутано тайной, что лишь усиливает мистический ореол вокруг его персоны. По слухам, он появился из ниоткуда, словно тень, обретающая форму лишь для того, чтобы сеять хаос.
+                    </p>
+                    <p>
+                        Первые упоминания о его "деятельности" относятся к началу 2018г, когда серия необъяснимых крахов на фондовых рынках сопровождалась появлением нового, анонимного игрока, всегда оказывавшегося в выигрыше. Доркос не оставлял следов, но почерк его операций — тонкий расчет, манипуляция информацией и безжалостная эксплуатация человеческих слабостей — становился всё более узнаваемым.
+                    </p>
+                    <p>
+                        Его империя строилась не на капитале, а на доверии, которое он безжалостно обманывал. Он мастерски создавал иллюзии процветания, вовлекая в свои схемы ничего не подозревающих жертв, а затем исчезал, оставляя за собой лишь руины и вопросы. Его методы включали в себя не только финансовые махинации, но и психологическое давление, умение находить самые уязвимые точки людей и использовать их против них самих.
+                    </p>
+                    <p>
+                        Несмотря на все усилия спецслужб и частных детективов, Доркос всегда оставался неуловим. Он словно призрак, проникающий сквозь стены систем и исчезающий в воздухе. Этот сайт — попытка собрать воедино все доступные фрагменты его зловещей мозаики, чтобы предостеречь других и, возможно, однажды, помочь остановить его.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция Галерея -->
+        <section id="gallery" class="py-16 px-6 md:px-12 bg-black">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 text-dorkos-accent">Галерея БЕЗ МАМНОГО</h2>
+
+                <!-- Фотографии -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+                    <img src="1.png" alt="Изображение 1" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="2.jpg" alt="Изображение 2" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="3.jpg" alt="Изображение 3" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="4.jpg" alt="Изображение 4" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="5.jpg" alt="Изображение 5" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="6.jpg" alt="Изображение 6" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="7.jpg" alt="Изображение 7" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="8.jpg" alt="Изображение 8" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                    <img src="9.jpg" alt="Изображение 9" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+					 <img src="10.jpg" alt="Изображение 10" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
+                </div>
+
+                <!-- Видео -->
+                <h3 class="text-3xl font-bold text-center mb-8 text-dorkos-accent">Видео-Досье</h3>
+                <div class="max-w-3xl mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden border-2 border-dorkos-accent">
+                    <div class="relative" style="padding-bottom: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                        <!-- Замените URL на свой реальный видеофайл -->
+                        <video controls class="absolute top-0 left-0 w-full h-full object-cover">
+                            <source src="sniper.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео тег.
+                        </video>
+                    </div>
+                    <p class="text-center text-gray-400 p-4">
+                        Краткий отрывок из записи наблюдения, предположительно фиксирующий один из моментов его исчезновения.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция Соцсети/Связь -->
+        <section id="social" class="py-16 px-6 md:px-12 bg-gray-900 text-center">
+            <div class="container mx-auto">
+				<h2 class="text-4xl font-bold mb-8 text-dorkos-accent">Информация взята "ТУТ"</h2>
+				<a href="https://belkagomel.by/2016/01/25/nobelevskij-laureat-direktor-nacbanka-otec-dvoix-detej-kem-sebya-vidyat-cherez-10-let-talantlivye-gomelskie-gimnazisty/?ysclid=mcehatnvm3302496129">ТУТ 1</a>
+				<a href="https://liceymes.by/home/1-news/371--l-r.html">ТУТ 2</a>
+				<p> Позвонить членососу +375 29 199-15-54 Дорошков Константин Юрьевич  </p>
+                <br><br>
+				<p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                    ДАННЫЙ МАСТЕР СПОРТА ПО ВСЕМ ВИДАМ СПОРТА ЖИВЕТ ТУТ
+                </p>
+                <div class="flex justify-center space-x-8">
+                    <a href="https://vk.com/id265413472" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300 text-5xl">
+                        <i class="fab fa-vk"></i>
+                        <span class="block text-xl mt-2">ВКонтакте</span>
+                    </a>
+                    <a href="https://discord.gg/dorkosfeed" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300 text-5xl">
+                        <i class="fab fa-discord"></i>
+                        <span class="block text-xl mt-2">Discord</span>
+                    </a>
+                    <a href="https://t.me/construtc2025" target="_blank" class="text-gray-400 hover:text-dorkos-accent transition duration-300 text-5xl">
+                        <i class="fab fa-telegram-plane"></i>
+                        <span class="block text-xl mt-2">Telegram</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Подвал -->
+    <footer class="bg-gray-950 py-8 px-6 md:px-12 text-center text-gray-500 text-sm">
+        <div class="container mx-auto">
+            <p>&copy; 2024 Dorkosfeed.ru. Все права защищены. Все персонажи и события, описанные на этом сайте, являются вымышленными. Любые совпадения с реальными людьми или событиями случайны.</p>
+        </div>
+    </footer>
+
+    <!-- Лайтбокс для изображений и видео -->
+    <div id="lightbox" class="lightbox-overlay hidden">
+        <span class="lightbox-close">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" class="hidden" src="https://youtube.com/shorts/wnFjK_G8FMo" alt="Лайтбокс изображение">
+            <div id="lightbox-video-wrapper" class="lightbox-video-wrapper hidden">
+                <video id="lightbox-video" controls autoplay muted class="w-full h-full object-cover">
+                    <source src="https://youtube.com/shorts/wnFjK_G8FMo" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Плавный скролл для навигации
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Лайтбокс функционал
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxVideoWrapper = document.getElementById('lightbox-video-wrapper');
+            const lightboxVideo = document.getElementById('lightbox-video');
+            const lightboxClose = document.querySelector('.lightbox-close');
+
+            document.querySelectorAll('.gallery-img').forEach(image => {
+                image.addEventListener('click', () => {
+                    lightboxImg.src = image.src;
+                    lightboxImg.classList.remove('hidden');
+                    lightboxVideoWrapper.classList.add('hidden'); // Скрыть видео, если оно было открыто
+                    lightbox.classList.add('active');
+                });
+            });
+
+            // Если хотите, чтобы видео тоже открывалось в лайтбоксе (для этого нужно сделать видео в галерее тоже кликабельным)
+            // Пример: если у вас видео в галерее обернуто в div с классом 'gallery-video'
+            /*
+            document.querySelectorAll('.gallery-video').forEach(videoContainer => {
+                videoContainer.addEventListener('click', () => {
+                    const videoSrc = videoContainer.querySelector('source').src; // Предполагаем, что source внутри
+                    lightboxVideo.querySelector('source').src = videoSrc;
+                    lightboxVideo.load(); // Перезагрузить видео для нового src
+                    lightboxVideoWrapper.classList.remove('hidden');
+                    lightboxImg.classList.add('hidden'); // Скрыть изображение
+                    lightbox.classList.add('active');
+                });
+            });
+            */
+
+            // Закрытие лайтбокса
+            lightboxClose.addEventListener('click', () => {
+                lightbox.classList.remove('active');
+                lightboxImg.classList.add('hidden'); // Скрыть изображение
+                lightboxVideoWrapper.classList.add('hidden'); // Скрыть видео
+                if (!lightboxVideo.paused) {
+                    lightboxVideo.pause(); // Остановить видео при закрытии
+                    lightboxVideo.currentTime = 0; // Сбросить время видео
+                }
+            });
+
+            // Закрытие лайтбокса по клику вне контента
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    lightbox.classList.remove('active');
+                    lightboxImg.classList.add('hidden');
+                    lightboxVideoWrapper.classList.add('hidden');
+                    if (!lightboxVideo.paused) {
+                        lightboxVideo.pause();
+                        lightboxVideo.currentTime = 0;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
