@@ -1,0 +1,2 @@
+# Gold-Lead
+SCAM PEOPLE SIN BLYADI
