@@ -1,7 +1,5 @@
-# Gold-Lead
 # Gold Lead/钢老板 - Биография Членососа
-
-## 🚀 Welcome to the **Gold Lead/钢老板** Project
+### 🚀 Welcome to the **Gold Lead/钢老板** Project
 
 ---
 
