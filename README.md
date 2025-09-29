@@ -3,8 +3,6 @@
 
 ## 🚀 Welcome to the **Gold Lead/钢老板** Project
 
-This project is a biography of **Dorkos**, a mysterious figure in the shadows, revealing the truth about manipulation, manipulation, and chaos.
-
 ---
 
 ## 🌐 Contents
@@ -17,8 +15,6 @@ This project is a biography of **Dorkos**, a mysterious figure in the shadows, r
 ---
 
 ## ⚙️ Project Setup
-
-The project utilizes the power of PHP for IP logging and TailwindCSS for styling, providing a clean and sleek design. Here's how you can set it up locally:
 
 1. Clone the repository:
     ```bash
@@ -49,17 +45,12 @@ The project utilizes the power of PHP for IP logging and TailwindCSS for styling
 
 ## 🎨 Card Designs
 
-The following cards represent key sections of the site:
-
 ### 🚨 Hero Card
 <div class="hero-illustration">
     <img src="1.png" alt="Hero Image" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
 </div>
-This card is a visual centerpiece, featuring a large image with futuristic hover effects and smooth transitions.
 
 📜 Lore Card
-html
-Копировать код
 <section id="lore" class="py-16 px-6 md:px-12 bg-gray-900">
     <div class="container mx-auto">
         <h2 class="text-4xl font-bold text-center mb-12 text-dorkos-accent">Лор: Путь к Темной Славе Петуха</h2>
@@ -70,16 +61,12 @@ html
         </div>
     </div>
 </section>
-The Lore card introduces a dark and deep narrative, combining sharp design elements and a sleek background for readability.
 
 🔗 Links
 ### Социальные сети
 
-- [ВКонтакте (страница 1)](https://vk.com/id265413472)
-- [ВКонтакте (страница 2)](https://vk.com/dorkostop)
-
-
-These links help connect with Dorkosfeed across various platforms.
+- [ВКонтакте](https://vk.com/id265413472)
+- [ВКонтакте](https://vk.com/dorkostop)
 
 📜 License
 This project is licensed under the MIT License - see the LICENSE file for details.
