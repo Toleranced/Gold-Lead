@@ -52,8 +52,6 @@ The project utilizes the power of PHP for IP logging and TailwindCSS for styling
 The following cards represent key sections of the site:
 
 ### 🚨 Hero Card
-
-```html
 <div class="hero-illustration">
     <img src="1.png" alt="Hero Image" class="gallery-img w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition duration-300 border-2 border-transparent hover:border-dorkos-accent">
 </div>
