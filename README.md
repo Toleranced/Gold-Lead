@@ -75,12 +75,11 @@ html
 The Lore card introduces a dark and deep narrative, combining sharp design elements and a sleek background for readability.
 
 🔗 Links
-Social Media
-VKontakte
+### Социальные сети
 
-Discord
+- [ВКонтакте (страница 1)](https://vk.com/id265413472)
+- [ВКонтакте (страница 2)](https://vk.com/dorkostop)
 
-Telegram
 
 These links help connect with Dorkosfeed across various platforms.
 
@@ -88,9 +87,6 @@ These links help connect with Dorkosfeed across various platforms.
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 Note: This is just a start. Based on the original HTML, you can further customize and expand the card and feature designs as per your needs. The cards in the Markdown allow for images, descriptions, and interactive elements such as hover effects for a futuristic look.
-
-vbnet
-Копировать код
 
 This README layout uses futuristic card designs and sections with simple navigation, fitting the aesthetic and layout style from your HTML page. Let me know if you'd like to modify any details or add specific features!
 
